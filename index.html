@@ -9,39 +9,25 @@
 body{
 font-family:Arial;
 margin:0;
-background:#2a0140;
+background:#2b0a3d;
 color:white;
 }
 
 header{
-background:#4b0082;
+background:#4c1a6a;
 padding:15px;
 display:flex;
 justify-content:space-between;
 align-items:center;
 }
 
-header span{
-font-size:24px;
-font-weight:bold;
-color:#d58cff;
+header h1{
+margin:0;
+color:#d59cff;
 }
 
 header input{
 padding:6px;
-}
-
-nav{
-background:#5a0fa3;
-padding:10px;
-}
-
-nav button{
-background:#c07bff;
-border:none;
-padding:8px;
-margin-right:8px;
-cursor:pointer;
 }
 
 .container{
@@ -50,56 +36,49 @@ padding:20px;
 
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fill,200px);
+grid-template-columns:repeat(auto-fill,180px);
 gap:20px;
 }
 
 .album{
-background:#3d036e;
-padding:10px;
-border-radius:8px;
 cursor:pointer;
-transition:.2s;
-}
-
-.album:hover{
-transform:scale(1.05);
 }
 
 .album img{
-width:100%;
+width:180px;
+height:180px;
+object-fit:cover;
 border-radius:6px;
 }
 
 .genre{
-background:#7d29cc;
+background:#7b4dff;
 padding:4px 8px;
-margin:4px;
-display:inline-block;
 border-radius:4px;
+margin:3px;
+display:inline-block;
 cursor:pointer;
-font-size:13px;
+font-size:12px;
 }
 
 .review{
-background:#3d036e;
+background:#3c1856;
 padding:10px;
 margin-top:10px;
 border-radius:6px;
 }
 
-input,textarea{
-width:100%;
-padding:6px;
-margin-top:6px;
-}
-
-button.submit{
-margin-top:6px;
-background:#c07bff;
+button{
+background:#9b6cff;
 border:none;
 padding:8px;
+margin-top:6px;
 cursor:pointer;
+}
+
+input,textarea{
+width:100%;
+margin-top:6px;
 }
 
 </style>
@@ -109,20 +88,11 @@ cursor:pointer;
 
 <header>
 
-<span>NeoOfTheYear</span>
+<h1>NeoOfTheYear</h1>
 
-<input id="search" placeholder="Search albums or artists">
+<input id="search" placeholder="Search albums">
 
 </header>
-
-<nav>
-
-<button onclick="home()">Home</button>
-<button onclick="top2026()">Top 2026</button>
-<button onclick="allTime()">Best Ever</button>
-<button onclick="trending()">Trending</button>
-
-</nav>
 
 <div class="container">
 
@@ -132,68 +102,46 @@ cursor:pointer;
 
 <script>
 
-/* ALBUM DATABASE */
+const albums=[
 
-let albums=[
+{title:"Some Rap Songs",artist:"Earl Sweatshirt",year:2018,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/8/8a/Some_Rap_Songs.jpg",score:90},
 
-{
-id:1,
-title:"Primetime",
-artist:"ACESQUAD NEO",
-year:2026,
-genres:["Cloud Rap","Experimental Hip Hop"],
-cover:"https://picsum.photos/300?1",
-spotify:"https://open.spotify.com/embed/track/11dFghVXANMlKmJXsNCbNl",
-youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ",
-critic:94
-},
+{title:"To Pimp a Butterfly",artist:"Kendrick Lamar",year:2015,genres:["Hip Hop","Jazz Rap"],cover:"https://upload.wikimedia.org/wikipedia/en/9/9c/To_Pimp_a_Butterfly.jpg",score:96},
 
-{
-id:2,
-title:"Some Rap Songs",
-artist:"Earl Sweatshirt",
-year:2018,
-genres:["Abstract Hip Hop","Lo-Fi Hip Hop"],
-cover:"https://upload.wikimedia.org/wikipedia/en/b/bf/Earl_Sweatshirt_-_Some_Rap_Songs.jpg",
-spotify:"https://open.spotify.com/embed/track/5JRMqkR82k2fdDEAim9SCN",
-youtube:"",
-critic:90
-}
+{title:"Blonde",artist:"Frank Ocean",year:2016,genres:["R&B"],cover:"https://upload.wikimedia.org/wikipedia/en/a/a0/Blonde_-_Frank_Ocean.jpeg",score:95},
+
+{title:"IGOR",artist:"Tyler, the Creator",year:2019,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/c/c3/Igor_-_Tyler%2C_the_Creator.jpg",score:89},
+
+{title:"My Beautiful Dark Twisted Fantasy",artist:"Kanye West",year:2010,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/f/f0/My_Beautiful_Dark_Twisted_Fantasy.jpg",score:94},
+
+{title:"good kid, m.A.A.d city",artist:"Kendrick Lamar",year:2012,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/9/93/KendrickGKMC.jpg",score:95},
+
+{title:"Flower Boy",artist:"Tyler, the Creator",year:2017,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/c/c3/Flower_Boy.jpg",score:90},
+
+{title:"Channel Orange",artist:"Frank Ocean",year:2012,genres:["R&B"],cover:"https://upload.wikimedia.org/wikipedia/en/2/28/Channel_ORANGE.jpg",score:92},
+
+{title:"The College Dropout",artist:"Kanye West",year:2004,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/a/a3/Kanyewest_collegedropout.jpg",score:94},
+
+{title:"Illmatic",artist:"Nas",year:1994,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/2/27/IllmaticNas.jpg",score:96},
+
+{title:"The Blueprint",artist:"Jay-Z",year:2001,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/2/2c/The_Blueprint.png",score:93},
+
+{title:"Enter the Wu-Tang (36 Chambers)",artist:"Wu-Tang Clan",year:1993,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/5/53/Wu-TangClanEntertheWu-Tangalbumcover.jpg",score:95},
+
+{title:"DAMN.",artist:"Kendrick Lamar",year:2017,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/5/51/Kendrick_Lamar_-_Damn.png",score:90},
+
+{title:"The Life of Pablo",artist:"Kanye West",year:2016,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/4/4d/The_life_of_pablo_alternate.jpg",score:87}
 
 ]
 
-/* GENERATE LARGE DATASET */
-
-for(let i=3;i<1000;i++){
-
-albums.push({
-
-id:i,
-title:"Album "+i,
-artist:"Artist "+Math.floor(i/3),
-year:2026,
-genres:["Hip Hop","Rock","Pop","Electronic"][Math.floor(Math.random()*4)],
-cover:"https://picsum.photos/300?random="+i,
-spotify:"",
-youtube:"",
-critic:Math.floor(Math.random()*40)+60
-
-})
-
-}
-
-/* REVIEW STORAGE */
+/* REVIEWS */
 
 function getReviews(id){
-
-return JSON.parse(localStorage.getItem("reviews"+id)||"[]")
-
+return JSON.parse(localStorage.getItem("rev"+id)||"[]")
 }
 
-function saveReviews(id,data){
-
-localStorage.setItem("reviews"+id,JSON.stringify(data))
-
+function saveReviews(id,r){
+localStorage.setItem("rev"+id,JSON.stringify(r))
 }
 
 /* HOME */
@@ -202,20 +150,14 @@ function home(){
 
 let html="<div class='grid'>"
 
-albums.slice(0,120).forEach(a=>{
+albums.forEach((a,i)=>{
 
 html+=`
-
-<div class="album" onclick="openAlbum(${a.id})">
-
+<div class="album" onclick="openAlbum(${i})">
 <img src="${a.cover}">
-
 <b>${a.title}</b><br>
-
-<span onclick="artistPage('${a.artist}')">${a.artist}</span>
-
+${a.artist}
 </div>
-
 `
 
 })
@@ -230,82 +172,46 @@ app.innerHTML=html
 
 function openAlbum(id){
 
-let a=albums.find(x=>x.id===id)
+let a=albums[id]
 
 let genres=""
 
 a.genres.forEach(g=>{
-
-genres+=`<span class="genre" onclick="genrePage('${g}')">${g}</span>`
-
+genres+=`<span class="genre" onclick="genre('${g}')">${g}</span>`
 })
 
 let reviews=getReviews(id)
 
-let reviewHTML=""
+let rhtml=""
 
 reviews.forEach(r=>{
-
-reviewHTML+=`
-
+rhtml+=`
 <div class="review">
-
-<b onclick="userPage('${r.user}')">${r.user}</b>
-
-⭐ ${r.score}
-
-<br>
-
+<b onclick="user('${r.user}')">${r.user}</b><br>
 ${r.text}
-
 </div>
-
 `
-
 })
-
-let avg="N/A"
-
-if(reviews.length){
-
-let total=0
-reviews.forEach(r=>total+=Number(r.score))
-avg=Math.round(total/reviews.length)
-
-}
 
 app.innerHTML=`
 
 <h1>${a.title}</h1>
-
-<h3 onclick="artistPage('${a.artist}')">${a.artist}</h3>
+<h3>${a.artist}</h3>
 
 <img src="${a.cover}" width="300">
 
+<p>${a.year}</p>
+
 <div>${genres}</div>
-
-<p>Critic Score ⭐ ${a.critic}</p>
-<p>User Score ⭐ ${avg}</p>
-
-<iframe src="${a.spotify}" width="300" height="80"></iframe>
-
-<br><br>
-
-<iframe width="400" height="225" src="${a.youtube}"></iframe>
 
 <h2>Reviews</h2>
 
-${reviewHTML}
+${rhtml}
 
-<h3>Add Review</h3>
-
-<input id="user">
-
-<input id="score" placeholder="Score 0-100">
-
+<input id="user" placeholder="name">
 <textarea id="text"></textarea>
 
-<button class="submit" onclick="submitReview(${id})">Submit</button>
+<button onclick="review(${id})">Submit</button>
 
 `
 
@@ -313,23 +219,19 @@ ${reviewHTML}
 
 /* SUBMIT REVIEW */
 
-function submitReview(id){
+function review(id){
 
 let user=document.getElementById("user").value
-let score=document.getElementById("score").value
 let text=document.getElementById("text").value
 
 let reviews=getReviews(id)
 
 if(reviews.find(r=>r.user===user)){
-
-alert("Only one review per album")
-
+alert("1 review per album")
 return
-
 }
 
-reviews.push({user,score,text})
+reviews.push({user,text})
 
 saveReviews(id,reviews)
 
@@ -337,57 +239,24 @@ openAlbum(id)
 
 }
 
-/* ARTIST PAGE */
-
-function artistPage(name){
-
-let artistAlbums=albums.filter(a=>a.artist===name)
-
-let html=`<h1>${name}</h1><div class="grid">`
-
-artistAlbums.forEach(a=>{
-
-html+=`
-
-<div class="album" onclick="openAlbum(${a.id})">
-
-<img src="${a.cover}">
-
-${a.title}
-
-</div>
-
-`
-
-})
-
-html+="</div>"
-
-app.innerHTML=html
-
-}
-
 /* GENRE PAGE */
 
-function genrePage(g){
+function genre(g){
 
-let filtered=albums.filter(a=>a.genres.includes(g))
+let html="<h1>"+g+"</h1><div class='grid'>"
 
-let html=`<h1>${g}</h1><div class="grid">`
+albums.forEach((a,i)=>{
 
-filtered.forEach(a=>{
+if(a.genres.includes(g)){
 
 html+=`
-
-<div class="album" onclick="openAlbum(${a.id})">
-
+<div class="album" onclick="openAlbum(${i})">
 <img src="${a.cover}">
-
 ${a.title}
-
 </div>
-
 `
+
+}
 
 })
 
@@ -399,32 +268,23 @@ app.innerHTML=html
 
 /* USER PAGE */
 
-function userPage(name){
+function user(name){
 
-let html=`<h1>${name}</h1>`
+let html="<h1>"+name+"</h1>"
 
-albums.forEach(a=>{
+albums.forEach((a,i)=>{
 
-let reviews=getReviews(a.id)
+let reviews=getReviews(i)
 
 reviews.forEach(r=>{
 
 if(r.user===name){
 
 html+=`
-
 <div class="review">
-
-<b>${a.title}</b>
-
-⭐ ${r.score}
-
-<br>
-
+<b>${a.title}</b><br>
 ${r.text}
-
 </div>
-
 `
 
 }
@@ -432,70 +292,6 @@ ${r.text}
 })
 
 })
-
-app.innerHTML=html
-
-}
-
-/* TOP 2026 */
-
-function top2026(){
-
-let list=albums.filter(a=>a.year===2026)
-
-list.sort((a,b)=>b.critic-a.critic)
-
-let html="<h1>Top Albums of 2026</h1><ol>"
-
-list.slice(0,25).forEach(a=>{
-
-html+=`<li onclick="openAlbum(${a.id})">${a.title} — ${a.artist}</li>`
-
-})
-
-html+="</ol>"
-
-app.innerHTML=html
-
-}
-
-/* BEST EVER */
-
-function allTime(){
-
-let sorted=[...albums].sort((a,b)=>b.critic-a.critic)
-
-let html="<h1>Best Albums Ever</h1><ol>"
-
-sorted.slice(0,50).forEach(a=>{
-
-html+=`<li onclick="openAlbum(${a.id})">${a.title} — ${a.artist}</li>`
-
-})
-
-html+="</ol>"
-
-app.innerHTML=html
-
-}
-
-/* TRENDING */
-
-function trending(){
-
-let list=[...albums]
-
-list.sort((a,b)=>getReviews(b.id).length-getReviews(a.id).length)
-
-let html="<h1>Trending Albums</h1><ol>"
-
-list.slice(0,25).forEach(a=>{
-
-html+=`<li onclick="openAlbum(${a.id})">${a.title}</li>`
-
-})
-
-html+="</ol>"
 
 app.innerHTML=html
 
@@ -516,18 +312,13 @@ a.artist.toLowerCase().includes(q)
 
 let html="<div class='grid'>"
 
-results.forEach(a=>{
+results.forEach((a,i)=>{
 
 html+=`
-
-<div class="album" onclick="openAlbum(${a.id})">
-
+<div class="album" onclick="openAlbum(${i})">
 <img src="${a.cover}">
-
 ${a.title}
-
 </div>
-
 `
 
 })
