@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>NeoOfTheYear</title>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#2a0d40;
+color:white;
+}
+
+header{
+background:#4b1a70;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+header h1{
+margin:0;
+color:#d59cff;
+}
+
+header input{
+padding:6px;
+width:200px;
+}
+
+nav{
+background:#5a2380;
+padding:10px;
+}
+
+nav button{
+background:#a56cff;
+border:none;
+padding:6px 10px;
+margin-right:5px;
+cursor:pointer;
+}
+
+.container{
+padding:20px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,180px);
+gap:20px;
+}
+
+.album img{
+width:180px;
+height:180px;
+object-fit:cover;
+border-radius:6px;
+}
+
+.album{
+cursor:pointer;
+}
+
+.genre{
+background:#7b4dff;
+padding:4px 8px;
+margin:4px;
+border-radius:4px;
+display:inline-block;
+cursor:pointer;
+font-size:12px;
+}
+
+.review{
+background:#3a185a;
+padding:10px;
+margin-top:10px;
+border-radius:6px;
+}
+
+input,textarea{
+width:100%;
+margin-top:5px;
+}
+
+button.submit{
+margin-top:6px;
+background:#b485ff;
+border:none;
+padding:8px;
+cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<h1>NeoOfTheYear</h1>
+
+<input id="search" placeholder="Search albums or artists">
+
+</header>
+
+<nav>
+
+<button onclick="home()">Home</button>
+<button onclick="topAlbums()">Top Albums</button>
+
+</nav>
+
+<div class="container">
+
+<div id="app"></div>
+
+</div>
+
+<script>
+
+/* ALBUM DATABASE */
+
+const albums=[
+
+{title:"Some Rap Songs",artist:"Earl Sweatshirt",year:2018,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/8/8a/Some_Rap_Songs.jpg",critic:90},
+
+{title:"To Pimp a Butterfly",artist:"Kendrick Lamar",year:2015,genres:["Hip Hop","Jazz Rap"],cover:"https://upload.wikimedia.org/wikipedia/en/9/9c/To_Pimp_a_Butterfly.jpg",critic:96},
+
+{title:"Blonde",artist:"Frank Ocean",year:2016,genres:["R&B"],cover:"https://upload.wikimedia.org/wikipedia/en/a/a0/Blonde_-_Frank_Ocean.jpeg",critic:95},
+
+{title:"IGOR",artist:"Tyler, the Creator",year:2019,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/c/c3/Igor_-_Tyler%2C_the_Creator.jpg",critic:89},
+
+{title:"My Beautiful Dark Twisted Fantasy",artist:"Kanye West",year:2010,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/f/f0/My_Beautiful_Dark_Twisted_Fantasy.jpg",critic:94},
+
+{title:"good kid, m.A.A.d city",artist:"Kendrick Lamar",year:2012,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/9/93/KendrickGKMC.jpg",critic:95},
+
+{title:"Flower Boy",artist:"Tyler, the Creator",year:2017,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/c/c3/Flower_Boy.jpg",critic:90},
+
+{title:"Channel Orange",artist:"Frank Ocean",year:2012,genres:["R&B"],cover:"https://upload.wikimedia.org/wikipedia/en/2/28/Channel_ORANGE.jpg",critic:92},
+
+{title:"Illmatic",artist:"Nas",year:1994,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/2/27/IllmaticNas.jpg",critic:96},
+
+{title:"The Blueprint",artist:"Jay-Z",year:2001,genres:["Hip Hop"],cover:"https://upload.wikimedia.org/wikipedia/en/2/2c/The_Blueprint.png",critic:93}
+
+]
+
+/* DUPLICATE LIST TO CREATE BIGGER DATASET */
+
+let bigAlbums=[...albums]
+
+for(let i=0;i<12;i++){
+albums.forEach(a=>bigAlbums.push({...a}))
+}
+
+/* REVIEWS */
+
+function getReviews(id){
+return JSON.parse(localStorage.getItem("rev"+id)||"[]")
+}
+
+function saveReviews(id,r){
+localStorage.setItem("rev"+id,JSON.stringify(r))
+}
+
+/* HOME */
+
+function home(){
+
+let html="<div class='grid'>"
+
+bigAlbums.forEach((a,i)=>{
+
+html+=`
+<div class="album" onclick="openAlbum(${i})">
+<img src="${a.cover}">
+<b>${a.title}</b><br>
+${a.artist}
+</div>
+`
+
+})
+
+html+="</div>"
+
+app.innerHTML=html
+
+}
+
+/* ALBUM PAGE */
+
+function openAlbum(id){
+
+let a=bigAlbums[id]
+
+let genres=""
+
+a.genres.forEach(g=>{
+genres+=`<span class="genre" onclick="genrePage('${g}')">${g}</span>`
+})
+
+let reviews=getReviews(id)
+
+let reviewHTML=""
+
+let avg="N/A"
+
+if(reviews.length){
+
+let total=0
+
+reviews.forEach(r=>total+=Number(r.score))
+
+avg=Math.round(total/reviews.length)
+
+}
+
+reviews.forEach(r=>{
+
+reviewHTML+=`
+
+<div class="review">
+
+<b onclick="userPage('${r.user}')">${r.user}</b>
+⭐ ${r.score}
+
+<br>
+
+${r.text}
+
+</div>
+
+`
+
+})
+
+app.innerHTML=`
+
+<h1>${a.title}</h1>
+<h3 onclick="artistPage('${a.artist}')">${a.artist}</h3>
+
+<img src="${a.cover}" width="300">
+
+<p>${a.year}</p>
+
+<div>${genres}</div>
+
+<p>Critic Score ⭐ ${a.critic}</p>
+<p>User Score ⭐ ${avg}</p>
+
+<h2>Reviews</h2>
+
+${reviewHTML}
+
+<input id="user" placeholder="name">
+
+<input id="score" placeholder="score 0-100">
+
+<textarea id="text"></textarea>
+
+<button class="submit" onclick="submitReview(${id})">Submit</button>
+
+`
+
+}
+
+/* REVIEW SUBMIT */
+
+function submitReview(id){
+
+let user=document.getElementById("user").value
+let score=document.getElementById("score").value
+let text=document.getElementById("text").value
+
+let reviews=getReviews(id)
+
+if(reviews.find(r=>r.user===user)){
+alert("Only 1 review per album")
+return
+}
+
+reviews.push({user,score,text})
+
+saveReviews(id,reviews)
+
+openAlbum(id)
+
+}
+
+/* GENRE PAGE */
+
+function genrePage(g){
+
+let filtered=bigAlbums.filter(a=>a.genres.includes(g))
+
+let html="<h1>"+g+"</h1><div class='grid'>"
+
+filtered.forEach((a,i)=>{
+
+html+=`
+<div class="album" onclick="openAlbum(${i})">
+<img src="${a.cover}">
+${a.title}
+</div>
+`
+
+})
+
+html+="</div>"
+
+app.innerHTML=html
+
+}
+
+/* ARTIST PAGE */
+
+function artistPage(name){
+
+let filtered=bigAlbums.filter(a=>a.artist===name)
+
+let html="<h1>"+name+"</h1><div class='grid'>"
+
+filtered.forEach((a,i)=>{
+
+html+=`
+<div class="album" onclick="openAlbum(${i})">
+<img src="${a.cover}">
+${a.title}
+</div>
+`
+
+})
+
+html+="</div>"
+
+app.innerHTML=html
+
+}
+
+/* USER PAGE */
+
+function userPage(name){
+
+let html="<h1>"+name+"</h1>"
+
+bigAlbums.forEach((a,i)=>{
+
+let reviews=getReviews(i)
+
+reviews.forEach(r=>{
+
+if(r.user===name){
+
+html+=`
+<div class="review">
+<b>${a.title}</b>
+⭐ ${r.score}
+<br>
+${r.text}
+</div>
+`
+
+}
+
+})
+
+})
+
+app.innerHTML=html
+
+}
+
+/* TOP ALBUMS */
+
+function topAlbums(){
+
+let sorted=[...bigAlbums].sort((a,b)=>b.critic-a.critic)
+
+let html="<h1>Top Albums</h1><ol>"
+
+sorted.slice(0,50).forEach(a=>{
+html+=`<li>${a.title} — ${a.artist}</li>`
+})
+
+html+="</ol>"
+
+app.innerHTML=html
+
+}
+
+/* SEARCH */
+
+search.addEventListener("input",e=>{
+
+let q=e.target.value.toLowerCase()
+
+let results=bigAlbums.filter(a=>
+
+a.title.toLowerCase().includes(q) ||
+a.artist.toLowerCase().includes(q)
+
+)
+
+let html="<div class='grid'>"
+
+results.forEach((a,i)=>{
+
+html+=`
+<div class="album" onclick="openAlbum(${i})">
+<img src="${a.cover}">
+${a.title}
+</div>
+`
+
+})
+
+html+="</div>"
+
+app.innerHTML=html
+
+})
+
+home()
+
+</script>
+
+</body>
+</html>
