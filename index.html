@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>NeoOfTheYear</title>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#2a0140;
+color:white;
+}
+
+header{
+background:#4b0082;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+header span{
+font-size:24px;
+font-weight:bold;
+color:#d58cff;
+}
+
+header input{
+padding:6px;
+}
+
+nav{
+background:#5a0fa3;
+padding:10px;
+}
+
+nav button{
+background:#c07bff;
+border:none;
+padding:8px;
+margin-right:8px;
+cursor:pointer;
+}
+
+.container{
+padding:20px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,200px);
+gap:20px;
+}
+
+.album{
+background:#3d036e;
+padding:10px;
+border-radius:8px;
+cursor:pointer;
+transition:.2s;
+}
+
+.album:hover{
+transform:scale(1.05);
+}
+
+.album img{
+width:100%;
+border-radius:6px;
+}
+
+.genre{
+background:#7d29cc;
+padding:4px 8px;
+margin:4px;
+display:inline-block;
+border-radius:4px;
+cursor:pointer;
+font-size:13px;
+}
+
+.review{
+background:#3d036e;
+padding:10px;
+margin-top:10px;
+border-radius:6px;
+}
+
+input,textarea{
+width:100%;
+padding:6px;
+margin-top:6px;
+}
+
+button.submit{
+margin-top:6px;
+background:#c07bff;
+border:none;
+padding:8px;
+cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<span>NeoOfTheYear</span>
+
+<input id="search" placeholder="Search albums or artists">
+
+</header>
+
+<nav>
+
+<button onclick="home()">Home</button>
+<button onclick="top2026()">Top 2026</button>
+<button onclick="allTime()">Best Ever</button>
+<button onclick="trending()">Trending</button>
+
+</nav>
+
+<div class="container">
+
+<div id="app"></div>
+
+</div>
+
+<script>
+
+/* ALBUM DATABASE */
+
+let albums=[
+
+{
+id:1,
+title:"Primetime",
+artist:"ACESQUAD NEO",
+year:2026,
+genres:["Cloud Rap","Experimental Hip Hop"],
+cover:"https://picsum.photos/300?1",
+spotify:"https://open.spotify.com/embed/track/11dFghVXANMlKmJXsNCbNl",
+youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ",
+critic:94
+},
+
+{
+id:2,
+title:"Some Rap Songs",
+artist:"Earl Sweatshirt",
+year:2018,
+genres:["Abstract Hip Hop","Lo-Fi Hip Hop"],
+cover:"https://upload.wikimedia.org/wikipedia/en/b/bf/Earl_Sweatshirt_-_Some_Rap_Songs.jpg",
+spotify:"https://open.spotify.com/embed/track/5JRMqkR82k2fdDEAim9SCN",
+youtube:"",
+critic:90
+}
+
+]
+
+/* GENERATE LARGE DATASET */
+
+for(let i=3;i<1000;i++){
+
+albums.push({
+
+id:i,
+title:"Album "+i,
+artist:"Artist "+Math.floor(i/3),
+year:2026,
+genres:["Hip Hop","Rock","Pop","Electronic"][Math.floor(Math.random()*4)],
+cover:"https://picsum.photos/300?random="+i,
+spotify:"",
+youtube:"",
+critic:Math.floor(Math.random()*40)+60
+
+})
+
+}
+
+/* REVIEW STORAGE */
+
+function getReviews(id){
+
+return JSON.parse(localStorage.getItem("reviews"+id)||"[]")
+
+}
+
+function saveReviews(id,data){
+
+localStorage.setItem("reviews"+id,JSON.stringify(data))
+
+}
+
+/* HOME */
+
+function home(){
+
+let html="<div class='grid'>"
+
+albums.slice(0,120).forEach(a=>{
+
+html+=`
+
+<div class="album" onclick="openAlbum(${a.id})">
+
+<img src="${a.cover}">
+
+<b>${a.title}</b><br>
+
+<span onclick="artistPage('${a.artist}')">${a.artist}</span>
+
+</div>
+
+`
+
+})
+
+html+="</div>"
+
+app.innerHTML=html
+
+}
+
+/* ALBUM PAGE */
+
+function openAlbum(id){
+
+let a=albums.find(x=>x.id===id)
+
+let genres=""
+
+a.genres.forEach(g=>{
+
+genres+=`<span class="genre" onclick="genrePage('${g}')">${g}</span>`
+
+})
+
+let reviews=getReviews(id)
+
+let reviewHTML=""
+
+reviews.forEach(r=>{
+
+reviewHTML+=`
+
+<div class="review">
+
+<b onclick="userPage('${r.user}')">${r.user}</b>
+
+⭐ ${r.score}
+
+<br>
+
+${r.text}
+
+</div>
+
+`
+
+})
+
+let avg="N/A"
+
+if(reviews.length){
+
+let total=0
+reviews.forEach(r=>total+=Number(r.score))
+avg=Math.round(total/reviews.length)
+
+}
+
+app.innerHTML=`
+
+<h1>${a.title}</h1>
+
+<h3 onclick="artistPage('${a.artist}')">${a.artist}</h3>
+
+<img src="${a.cover}" width="300">
+
+<div>${genres}</div>
+
+<p>Critic Score ⭐ ${a.critic}</p>
+<p>User Score ⭐ ${avg}</p>
+
+<iframe src="${a.spotify}" width="300" height="80"></iframe>
+
+<br><br>
+
+<iframe width="400" height="225" src="${a.youtube}"></iframe>
+
+<h2>Reviews</h2>
+
+${reviewHTML}
+
+<h3>Add Review</h3>
+
+<input id="user">
+
+<input id="score" placeholder="Score 0-100">
+
+<textarea id="text"></textarea>
+
+<button class="submit" onclick="submitReview(${id})">Submit</button>
+
+`
+
+}
+
+/* SUBMIT REVIEW */
+
+function submitReview(id){
+
+let user=document.getElementById("user").value
+let score=document.getElementById("score").value
+let text=document.getElementById("text").value
+
+let reviews=getReviews(id)
+
+if(reviews.find(r=>r.user===user)){
+
+alert("Only one review per album")
+
+return
+
+}
+
+reviews.push({user,score,text})
+
+saveReviews(id,reviews)
+
+openAlbum(id)
+
+}
+
+/* ARTIST PAGE */
+
+function artistPage(name){
+
+let artistAlbums=albums.filter(a=>a.artist===name)
+
+let html=`<h1>${name}</h1><div class="grid">`
+
+artistAlbums.forEach(a=>{
+
+html+=`
+
+<div class="album" onclick="openAlbum(${a.id})">
+
+<img src="${a.cover}">
+
+${a.title}
+
+</div>
+
+`
+
+})
+
+html+="</div>"
+
+app.innerHTML=html
+
+}
+
+/* GENRE PAGE */
+
+function genrePage(g){
+
+let filtered=albums.filter(a=>a.genres.includes(g))
+
+let html=`<h1>${g}</h1><div class="grid">`
+
+filtered.forEach(a=>{
+
+html+=`
+
+<div class="album" onclick="openAlbum(${a.id})">
+
+<img src="${a.cover}">
+
+${a.title}
+
+</div>
+
+`
+
+})
+
+html+="</div>"
+
+app.innerHTML=html
+
+}
+
+/* USER PAGE */
+
+function userPage(name){
+
+let html=`<h1>${name}</h1>`
+
+albums.forEach(a=>{
+
+let reviews=getReviews(a.id)
+
+reviews.forEach(r=>{
+
+if(r.user===name){
+
+html+=`
+
+<div class="review">
+
+<b>${a.title}</b>
+
+⭐ ${r.score}
+
+<br>
+
+${r.text}
+
+</div>
+
+`
+
+}
+
+})
+
+})
+
+app.innerHTML=html
+
+}
+
+/* TOP 2026 */
+
+function top2026(){
+
+let list=albums.filter(a=>a.year===2026)
+
+list.sort((a,b)=>b.critic-a.critic)
+
+let html="<h1>Top Albums of 2026</h1><ol>"
+
+list.slice(0,25).forEach(a=>{
+
+html+=`<li onclick="openAlbum(${a.id})">${a.title} — ${a.artist}</li>`
+
+})
+
+html+="</ol>"
+
+app.innerHTML=html
+
+}
+
+/* BEST EVER */
+
+function allTime(){
+
+let sorted=[...albums].sort((a,b)=>b.critic-a.critic)
+
+let html="<h1>Best Albums Ever</h1><ol>"
+
+sorted.slice(0,50).forEach(a=>{
+
+html+=`<li onclick="openAlbum(${a.id})">${a.title} — ${a.artist}</li>`
+
+})
+
+html+="</ol>"
+
+app.innerHTML=html
+
+}
+
+/* TRENDING */
+
+function trending(){
+
+let list=[...albums]
+
+list.sort((a,b)=>getReviews(b.id).length-getReviews(a.id).length)
+
+let html="<h1>Trending Albums</h1><ol>"
+
+list.slice(0,25).forEach(a=>{
+
+html+=`<li onclick="openAlbum(${a.id})">${a.title}</li>`
+
+})
+
+html+="</ol>"
+
+app.innerHTML=html
+
+}
+
+/* SEARCH */
+
+search.addEventListener("input",e=>{
+
+let q=e.target.value.toLowerCase()
+
+let results=albums.filter(a=>
+
+a.title.toLowerCase().includes(q) ||
+a.artist.toLowerCase().includes(q)
+
+)
+
+let html="<div class='grid'>"
+
+results.forEach(a=>{
+
+html+=`
+
+<div class="album" onclick="openAlbum(${a.id})">
+
+<img src="${a.cover}">
+
+${a.title}
+
+</div>
+
+`
+
+})
+
+html+="</div>"
+
+app.innerHTML=html
+
+})
+
+home()
+
+</script>
+
+</body>
+</html>
